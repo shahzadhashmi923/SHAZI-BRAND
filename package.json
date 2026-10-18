@@ -1,0 +1,8 @@
+{
+  "name": "shazi-xmd",
+  "type": "module",
+  "dependencies": {
+    "@whiskeysockets/baileys": "6.7.18",
+    "pino": "^8.19.0"
+  }
+}
