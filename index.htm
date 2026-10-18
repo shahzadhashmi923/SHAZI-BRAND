@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SHAZI-MD - Pair Code</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}body{background:#0f0f14;color:#fff;display:flex;justify-content:center;padding:20px}
+.card{width:100%;max-width:420px;background:#1a1a24;border-radius:24px;padding:22px;border:1px solid #2a2a3a}
+.top{display:flex;justify-content:center;flex-direction:column;align-items:center}.logo{width:80px;height:80px;background:linear-gradient(135deg,#ff6a00,#ff9a00);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 0 30px #ff6a0033}
+h1{color:#ff7a00;margin:12px 0 4px;letter-spacing:1px}.sub{color:#888;font-size:14px;margin-bottom:18px}
+.stats{background:#252530;border-radius:12px;padding:10px;text-align:center;font-size:13px;margin-bottom:14px;color:#aaa}.stats b{color:#ff8c00}
+.servers{display:flex;justify-content:space-between;background:#241f1f;border:1px solid #3a2a2a;border-radius:14px;padding:14px;margin-bottom:12px}
+.btns{display:flex;gap:10px;margin-bottom:16px}.btns div{flex:1;background:#2a2432;padding:12px;border-radius:12px;text-align:center;font-size:14px;cursor:pointer}
+.quick{background:#2a1f1f;border:1px solid #4a2a2a;border-radius:12px;padding:14px;margin-bottom:18px}.quick b{color:#fff;display:flex;align-items:center;gap:6px}
+input{width:100%;background:#11111a;border:1px solid #333;padding:14px;border-radius:12px;color:#fff;font-size:16px;outline:none;margin:10px 0}
+.generate{width:100%;background:linear-gradient(90deg,#8a3a1a,#c46a1a);padding:14px;border-radius:12px;border:none;color:#fff;font-weight:700;font-size:16px;cursor:pointer;margin-bottom:12px}
+.codebox{width:100%;background:#11111a;border:1px solid #ff6a00;padding:14px;border-radius:12px;text-align:center;font-size:22px;letter-spacing:2px;font-weight:700;margin-bottom:10px;min-height:56px;display:flex;align-items:center;justify-content:center}
+.bar{width:100%;height:4px;background:#333;border-radius:10px;overflow:hidden;margin-bottom:6px}.fill{height:100%;background:linear-gradient(90deg,#ff6a00,#ffaa00);width:100%;transition:width 1s linear}
+.meta{display:flex;justify-content:space-between;font-size:12px;color:#888;margin-bottom:12px}
+.actions{display:flex;gap:10px}.actions button{flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-weight:600}
+.cpy{background:#23232f;color:#fff}.shr{background:#1a332a;color:#2ecc71}.rty{background:#332a1a;color:#ffaa00}
+</style></head><body>
+<div class="card">
+<div class="top"><div class="logo">⚡</div><h1>SHAZI-MD</h1><div class="sub">Generate Your Pairing Code</div></div>
+<div class="stats">📊 Success Rate: <b>76% (31✓ / 5x)</b></div>
+<div class="servers"><div><b>Server 85</b> <span style="background:#ff3a00;color:#fff;padding:2px 8px;border-radius:20px;font-size:11px">⚡ AUTO</span><div style="font-size:12px;color:#888;margin-top:4px">🟡 Active: 2 &nbsp; 🐾 Limit: 2/30</div></div><div><button onclick="location.reload()" style="background:#2a2a3a;color:#fff;border:none;padding:8px 14px;border-radius:20px">⌄ Change</button></div></div>
+<div class="btns"><div>🔄 Auto New Server</div><div>🎰 Lucky Spin</div></div>
+<div class="quick"><b>🔴 Quick Setup</b><div style="color:#aaa;font-size:13px;margin-top:6px">Server is auto-selected for best performance. Just enter your WhatsApp number to instantly generate a pairing code!</div></div>
+<label style="font-size:14px">WhatsApp Number</label>
+<input id="num" placeholder="923209834685" value="923209834685"><div style="font-size:12px;color:#666">💡 Include country code (e.g., 92 for Pakistan)</div>
+<button id="gen" class="generate">🔑 Generate Pair Code</button>
+<div id="codebox" class="codebox">Your pairing code will appear here</div>
+<div class="bar"><div id="fill" class="fill"></div></div>
+<div class="meta"><span>Code expires in</span><span id="exp">30s</span></div>
+<div class="actions"><button id="cpy" class="cpy">📋 Copy Code</button><button id="shr" class="shr">🔗 Share</button><button id="rty" class="rty">↻ Retry</button></div>
+</div>
+<script>
+let timer=null,expire=null; const numEl=document.getElementById('num'),gen=document.getElementById('gen'),box=document.getElementById('codebox'),fill=document.getElementById('fill'),exp=document.getElementById('exp');
+async function generate(){
+ let n=numEl.value.replace(/[^0-9]/g,""); if(!n||n.length<10){box.innerText="Valid number dalo";return}
+ gen.innerHTML="⏳ Wait 3s"; gen.disabled=true;
+ try{
+   let r=await fetch(`/api/pair?num=${n}`); let d=await r.json();
+   if(d.error) throw new Error(d.error);
+   let code=d.code.replace(/-/g,"");
+   box.innerText=code;
+   startExpire();
+ }catch(e){ box.innerText="Error: "+e.message; gen.innerHTML="🔑 Generate Pair Code"; gen.disabled=false; return }
+ gen.innerHTML="✅ SHAZIXMD Generated"; setTimeout(()=>{gen.innerHTML="🔑 Generate Pair Code";gen.disabled=false},3000);
+}
+function startExpire(){
+ let left=30; fill.style.width="100%"; exp.innerText=left+"s";
+ clearInterval(expire); expire=setInterval(()=>{ left--; exp.innerText=left+"s"; fill.style.width=(left/30*100)+"%"; if(left<=0){clearInterval(expire);box.innerText="Code Expired - Retry karo";fill.style.width="0%"} },1000);
+}
+gen.onclick=generate;
+document.getElementById('cpy').onclick=()=>{ navigator.clipboard.writeText(box.innerText); let b=document.getElementById('cpy'); b.innerText="Copied!"; setTimeout(()=>b.innerText="📋 Copy Code",1500) };
+document.getElementById('shr').onclick=()=>{ if(navigator.share) navigator.share({title:"SHAZI-MD Code",text:box.innerText}); else navigator.clipboard.writeText(box.innerText) };
+document.getElementById('rty').onclick=()=>{ box.innerText="Your pairing code will appear here"; generate(); };
+</script></body></html>
